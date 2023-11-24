@@ -126,24 +126,41 @@ app.post('/addmessages', async (req, res) => {
 app.post("/add_device_token", async (req, res) => {
   try {
     const { deviceToken, userId } = req.body;
-    const cRef = db.collection('Device').doc();
-    const item = {
-      deviceToken: deviceToken,
-      userId: userId
-    };
-    cRef.set(item);
-    res.status(200).send({
-      status: 'success',
-      message: 'device token add successfully',
-      data: item,
-    });
 
+    // Check if document with userId exists
+    const existingDoc = await db.collection('Device').where('userId', '==', userId).get();
+
+    if (existingDoc.empty) {
+      // If no document found, create a new one
+      const cRef = db.collection('Device').doc();
+      const item = {
+        deviceToken: deviceToken,
+        userId: userId
+      };
+      await cRef.set(item);
+      res.status(200).send({
+        status: 'success',
+        message: 'device token added successfully',
+        data: item,
+      });
+    } else {
+      // If document found, update the existing one
+      const docId = existingDoc.docs[0].id;
+      const updateItem = {
+        deviceToken: deviceToken,
+      };
+      await db.collection('Device').doc(docId).update(updateItem);
+
+      res.status(200).send({
+        status: 'success',
+        message: 'device token updated successfully',
+        data: updateItem,
+      });
+    }
   } catch (error) {
     res.status(500).json(error.message);
   }
-}
-);
-
+});
 
 
 
