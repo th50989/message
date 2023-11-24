@@ -55,7 +55,7 @@ function pushNoti(registrationToken)
     //   key2: 'value2',
     // },
     notification: {
-      title: 'Ban co tin nhan moi',
+      title: 'Bạn có tin nhắn mới',
       body: 'New messages arrived',
     },
     token: registrationToken,
@@ -93,14 +93,28 @@ app.post('/addmessages', async (req, res) => {
     console.log('add done', item);
     await counterRef.set({ count: currentCount + 1 });
     c.set(item);
+    
+
+    const query = db.collection("Device")
+    .where('userId', '==', UserIdTo);
+  query.get()
+  .then(snapshot => {
+    snapshot.forEach(doc => {
+      // Access the deviceToken field in each document
+      const deviceToken = doc.data().deviceToken;
+      console.log(deviceToken);
+      pushNoti(deviceToken);
     res.status(200).send({
       status: 'success',
-      message: 'item added successfully',
+      message: 'item added successfully,'+deviceToken,
       data: item,
     });
-    const deviceTokenCollection = db.collection('Device').doc();
-    var deviceToken = deviceTokenCollection.collection().where("userId").isEqual.UserIdTo;
-    pushNoti(deviceToken);
+    });
+  })
+  .catch(error => {
+    console.error('Error getting documents: ', error);
+  });
+    
     
   } catch (error) {
     res.status(500).json(error.message);
@@ -134,15 +148,15 @@ app.post("/add_device_token", async (req, res) => {
 
 
 
-app.post("/pushNoti", async (req, res) => {
-  const peerUserId = req.body;
+// app.post("/pushNoti", async (req, res) => {
+//   const peerUserId = req.body;
 
 
 
-  const registrationToken = req.body;
-  // const registrationToken = 
-  // 'dZGpuzXETGi_7CfNt3Awiv:APA91bE77HBtPpue-wE9vn8zTLj8vbNZLxWRUg2KIvJW8DbBsPL7S3L8Aw-QMHNMexoUOzUBheot9lgNkuWju_aw5BfcvdzNMi9rGJ56uhkbOVzGMizTGxYonH1utr7VhXW0_3TdJmNe';
-  //const registrationToken = 'e5HTyY3fRySu2zX19NDaxH:APA91bGdLWrMCKlz_AI55UnqBj2BTxjl8ecDS8f_7_04w2nmRI4E_bpYSy_4-9asc617jefPC5P8FNz7I6gCTXFVWq6ViI99eCuF_MgDDFX_URmCcyrEYWLpE_ZGH5g3IwNhE3nG7pEJ';
+//   const registrationToken = req.body;
+//   // const registrationToken = 
+//   // 'dZGpuzXETGi_7CfNt3Awiv:APA91bE77HBtPpue-wE9vn8zTLj8vbNZLxWRUg2KIvJW8DbBsPL7S3L8Aw-QMHNMexoUOzUBheot9lgNkuWju_aw5BfcvdzNMi9rGJ56uhkbOVzGMizTGxYonH1utr7VhXW0_3TdJmNe';
+//   //const registrationToken = 'e5HTyY3fRySu2zX19NDaxH:APA91bGdLWrMCKlz_AI55UnqBj2BTxjl8ecDS8f_7_04w2nmRI4E_bpYSy_4-9asc617jefPC5P8FNz7I6gCTXFVWq6ViI99eCuF_MgDDFX_URmCcyrEYWLpE_ZGH5g3IwNhE3nG7pEJ';
 
   
-});
+// });
