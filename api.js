@@ -39,9 +39,10 @@ app.post('/addmessages', async (req, res) => {
         const counterRef = db.collection('Counters').doc('messagesCounter');
         const counterDoc = await counterRef.get();
         const currentCount = counterDoc.exists ? counterDoc.data().count : 0;
-        
         const currentTime = admin.firestore.Timestamp.now().toDate();
-        const formattedTime = moment(currentTime).tz('UTC+7').format('YYYY-MM-DD HH:mm:ss.SSSSSSS');
+        console.log(currentTime);
+        const formattedTime = moment(currentTime).tz('Asia/Bangkok').format('YYYY-MM-DD HH:mm:ss.SSSSSSS');
+        console.log(formattedTime);
         const c = db.collection('Messages').doc();
         const item = {
             UserIdTo: UserIdTo,
@@ -79,3 +80,32 @@ app.post('/addmessages', async (req, res) => {
       res.status(500).json({ message: error });
     }
   });
+
+
+
+
+  app.post("/pushNoti", async (req, res) => {
+    const registrationToken = 'dZGpuzXETGi_7CfNt3Awiv:APA91bE77HBtPpue-wE9vn8zTLj8vbNZLxWRUg2KIvJW8DbBsPL7S3L8Aw-QMHNMexoUOzUBheot9lgNkuWju_aw5BfcvdzNMi9rGJ56uhkbOVzGMizTGxYonH1utr7VhXW0_3TdJmNe';
+
+    const message = {
+      data: {
+        // Add your custom data here
+        key1: 'value1',
+        key2: 'value2',
+      },
+      notification: {
+        title: 'Title of your notification',
+        body: 'Body of your notification',
+      },
+      token: registrationToken,
+    };
+    
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.error('Error sending message:', error);
+      });
+  });
+ 
